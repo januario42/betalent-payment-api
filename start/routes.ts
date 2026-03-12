@@ -18,23 +18,31 @@ router.group(() => {
   // Auth
   router.post('/logout', [AuthController, 'logout'])
 
-  // Usuários
+  // Usuários — só admin
   router.resource('users', UsersController).apiOnly()
+    .use('*', middleware.role({ roles: ['admin'] }))
 
-  // Produtos
+  // Produtos — qualquer autenticado
   router.resource('products', ProductsController).apiOnly()
 
-  // Clientes
+  // Clientes — só admin
   router.get('/clients', [ClientsController, 'index'])
+    .use(middleware.role({ roles: ['admin'] }))
   router.get('/clients/:id', [ClientsController, 'show'])
+    .use(middleware.role({ roles: ['admin'] }))
 
-  // Transações
+  // Transações — qualquer autenticado
   router.get('/transactions', [TransactionsController, 'index'])
   router.get('/transactions/:id', [TransactionsController, 'show'])
-  router.post('/transactions/:id/refund', [TransactionsController, 'refund'])
 
-  // Gateways
+  // Reembolso — só admin
+  router.post('/transactions/:id/refund', [TransactionsController, 'refund'])
+    .use(middleware.role({ roles: ['admin'] }))
+
+  // Gateways — só admin
   router.patch('/gateways/:id/toggle', [GatewaysController, 'toggleActive'])
+    .use(middleware.role({ roles: ['admin'] }))
   router.patch('/gateways/:id/priority', [GatewaysController, 'updatePriority'])
+    .use(middleware.role({ roles: ['admin'] }))
 
 }).use(middleware.auth())
