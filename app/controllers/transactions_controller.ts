@@ -30,51 +30,60 @@ export default class TransactionsController {
   }
 
   async store({ request, response }: HttpContext) {
-    const data = await request.validateUsing(createTransactionValidator)
+  const data = await request.validateUsing(createTransactionValidator)
 
-    let client = await Client.firstOrCreate(
-      { email: data.email },
-      { name: data.name, email: data.email }
-    )
+  let client = await Client.firstOrCreate(
+    { email: data.email },
+    { name: data.name, email: data.email }
+  )
 
-    let totalAmount = 0
-    for (const item of data.products) {
-      const product = await Product.findOrFail(item.id)
-      totalAmount += product.amount * item.quantity
-    }
+ 
+  const ids = data.products.map((item) => item.id)
+  const products = await Product.query().whereIn('id', ids)
 
-    const paymentService = new PaymentService()
-    const { gateway, result } = await paymentService.charge({
-      amount: totalAmount,
-      name: data.name,
-      email: data.email,
-      cardNumber: data.cardNumber,
-      cvv: data.cvv,
-    })
-
-    const transaction = await Transaction.create({
-      clientId: client.id,
-      gatewayId: gateway.id,
-      externalId: result.externalId,
-      status: result.status,
-      amount: totalAmount,
-      cardLastNumbers: result.cardLastNumbers,
-    })
-
-    for (const item of data.products) {
-      await TransactionProduct.create({
-        transactionId: transaction.id,
-        productId: item.id,
-        quantity: item.quantity,
-      })
-    }
-
-    await transaction.load('transactionProducts', (query) => query.preload('product'))
-    await transaction.load('gateway')
-    await transaction.load('client')
-
-    return response.created(transaction)
+  if (products.length !== ids.length) {
+    return response.badRequest({ message: 'Um ou mais produtos não encontrados' })
   }
+
+
+  let totalAmount = 0
+  for (const item of data.products) {
+    const product = products.find((p) => p.id === item.id)!
+    totalAmount += product.amount * item.quantity
+  }
+
+  const paymentService = new PaymentService()
+  const { gateway, result } = await paymentService.charge({
+    amount: totalAmount,
+    name: data.name,
+    email: data.email,
+    cardNumber: data.cardNumber,
+    cvv: data.cvv,
+  })
+
+  const transaction = await Transaction.create({
+    clientId: client.id,
+    gatewayId: gateway.id,
+    externalId: result.externalId,
+    status: result.status,
+    amount: totalAmount,
+    cardLastNumbers: result.cardLastNumbers,
+  })
+
+  for (const item of data.products) {
+    await TransactionProduct.create({
+      transactionId: transaction.id,
+      productId: item.id,
+      quantity: item.quantity,
+    })
+  }
+
+  await transaction.load('transactionProducts', (query) => query.preload('product'))
+  await transaction.load('gateway')
+  await transaction.load('client')
+
+  return response.created(transaction)
+}
 
   async refund({ params, response }: HttpContext) {
     const transaction = await Transaction.query()
