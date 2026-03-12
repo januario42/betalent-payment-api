@@ -8,7 +8,6 @@
 | to JavaScript data types.
 |
 */
-
 import { Env } from '@adonisjs/core/env'
 
 export default await Env.create(new URL('../', import.meta.url), {
@@ -25,14 +24,20 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
 
-  /*
-  |----------------------------------------------------------
-  | Variables for configuring database connection
-  |----------------------------------------------------------
-  */
+  // Database
   DB_HOST: Env.schema.string({ format: 'host' }),
   DB_PORT: Env.schema.number(),
   DB_USER: Env.schema.string(),
   DB_PASSWORD: Env.schema.string.optional(),
-  DB_DATABASE: Env.schema.string()
+  DB_DATABASE: Env.schema.string(),
+
+ // Gateway 1
+  GATEWAY1_URL: Env.schema.string(),
+  GATEWAY1_EMAIL: Env.schema.string(),
+  GATEWAY1_TOKEN: Env.schema.string(),
+
+  // Gateway 2
+  GATEWAY2_URL: Env.schema.string(),
+  GATEWAY2_AUTH_TOKEN: Env.schema.string(),
+  GATEWAY2_AUTH_SECRET: Env.schema.string(),
 })

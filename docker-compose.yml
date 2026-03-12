@@ -29,11 +29,20 @@ services:
       HOST: 0.0.0.0
       NODE_ENV: production
       APP_KEY: ${APP_KEY}
+      APP_URL: http://localhost:3333
+      LOG_LEVEL: info
+      SESSION_DRIVER: cookie
       DB_HOST: mysql
       DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: root
       DB_DATABASE: betalent
+      GATEWAY1_URL: http://gateway_mock:3001
+      GATEWAY1_EMAIL: dev@betalent.tech
+      GATEWAY1_TOKEN: FEC9BB078BF338F464F96B48089EB498
+      GATEWAY2_URL: http://gateway_mock:3002
+      GATEWAY2_AUTH_TOKEN: tk_f2198cc671b5289fa856
+      GATEWAY2_AUTH_SECRET: 3d15e8ed6131446ea7e3456728b1211f
     depends_on:
       mysql:
         condition: service_healthy

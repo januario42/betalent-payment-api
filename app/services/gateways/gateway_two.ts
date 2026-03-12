@@ -1,11 +1,15 @@
 import axios from 'axios'
+import env from '#start/env'
 import type { GatewayInterface, GatewayTransaction, GatewayResponse } from './gateway_interface.js'
 
 export default class GatewayTwo implements GatewayInterface {
-  private baseUrl = 'http://localhost:3002'
-  private headers = {
-    'Gateway-Auth-Token': 'tk_f2198cc671b5289fa856',
-    'Gateway-Auth-Secret': '3d15e8ed6131446ea7e3456728b1211f',
+  private baseUrl = env.get('GATEWAY2_URL')
+
+  private getHeaders() {
+    return {
+      'Gateway-Auth-Token': env.get('GATEWAY2_AUTH_TOKEN'),
+      'Gateway-Auth-Secret': env.get('GATEWAY2_AUTH_SECRET'),
+    }
   }
 
   async charge(data: GatewayTransaction): Promise<GatewayResponse> {
@@ -18,8 +22,9 @@ export default class GatewayTwo implements GatewayInterface {
         numeroCartao: data.cardNumber,
         cvv: data.cvv,
       },
-      { headers: this.headers }
+      { headers: this.getHeaders() }
     )
+
     const result = response.data
     return {
       externalId: result.id,
@@ -32,7 +37,7 @@ export default class GatewayTwo implements GatewayInterface {
     await axios.post(
       `${this.baseUrl}/transacoes/reembolso`,
       { id: externalId },
-      { headers: this.headers }
+      { headers: this.getHeaders() }
     )
   }
 }
