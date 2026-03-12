@@ -7,15 +7,20 @@ import PaymentService from '#services/payment_service'
 import { createTransactionValidator } from '#validators/transaction'
 
 export default class TransactionsController {
-  async index({ response }: HttpContext) {
-    const transactions = await Transaction.query()
-      .preload('client')
-      .preload('gateway')
-      .preload('transactionProducts', (query) => {
-        query.preload('product')
-      })
-    return response.ok(transactions)
-  }
+ async index({ request, response }: HttpContext) {
+  const page = request.input('page', 1)
+  const limit = request.input('limit', 10)
+
+  const transactions = await Transaction.query()
+    .preload('client')
+    .preload('gateway')
+    .preload('transactionProducts', (query) => {
+      query.preload('product')
+    })
+    .paginate(page, limit)
+
+  return response.ok(transactions)
+}
 
   async show({ params, response }: HttpContext) {
     const transaction = await Transaction.query()

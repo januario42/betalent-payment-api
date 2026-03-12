@@ -19,9 +19,13 @@ export default class AuthController {
     })
   }
 
- async logout({ auth, response }: HttpContext) {
-  const user = auth.user as any
-  await User.accessTokens.delete(user, user.currentAccessToken.identifier)
-  return response.ok({ message: 'Logout realizado com sucesso' })
+async logout({ auth, response }: HttpContext) {
+  try {
+    const user = auth.user as any
+    await User.accessTokens.delete(user, user.currentAccessToken.identifier)
+    return response.ok({ message: 'Logout realizado com sucesso' })
+  } catch {
+    return response.ok({ message: 'Logout realizado com sucesso' })
+  }
 }
 }

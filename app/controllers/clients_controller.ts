@@ -2,10 +2,13 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client'
 
 export default class ClientsController {
-  async index({ response }: HttpContext) {
-    const clients = await Client.all()
-    return response.ok(clients)
-  }
+  async index({ request, response }: HttpContext) {
+  const page = request.input('page', 1)
+  const limit = request.input('limit', 10)
+
+  const clients = await Client.query().paginate(page, limit)
+  return response.ok(clients)
+}
 
   async show({ params, response }: HttpContext) {
     const client = await Client.query()
