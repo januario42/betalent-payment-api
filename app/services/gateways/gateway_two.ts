@@ -20,11 +20,10 @@ export default class GatewayTwo implements GatewayInterface {
       },
       { headers: this.headers }
     )
-
     const result = response.data
     return {
       externalId: result.id,
-      status: result.status,
+      status: 'approved' as const,
       cardLastNumbers: data.cardNumber.slice(-4),
     }
   }

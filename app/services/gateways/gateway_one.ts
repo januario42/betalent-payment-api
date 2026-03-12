@@ -35,7 +35,7 @@ export default class GatewayOne implements GatewayInterface {
     const result = response.data
     return {
       externalId: result.id,
-      status: result.status,
+      status: 'approved' as const,
       cardLastNumbers: data.cardNumber.slice(-4),
     }
   }

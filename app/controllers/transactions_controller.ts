@@ -62,13 +62,13 @@ export default class TransactionsController {
   })
 
   const transaction = await Transaction.create({
-    clientId: client.id,
-    gatewayId: gateway.id,
-    externalId: result.externalId,
-    status: result.status,
-    amount: totalAmount,
-    cardLastNumbers: result.cardLastNumbers,
-  })
+  clientId: client.id,
+  gatewayId: gateway.id,
+  externalId: result.externalId,
+  status: result.status,
+  amount: totalAmount,
+  cardLastNumbers: result.cardLastNumbers,
+})
 
   for (const item of data.products) {
     await TransactionProduct.create({
