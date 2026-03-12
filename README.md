@@ -32,11 +32,28 @@ node ace generate:key
 ```
 
 ## 🐳 Subindo o ambiente
+
+### Com Docker completo (recomendado)
 ```bash
-# Sobe MySQL + mock dos gateways
+# Sobe MySQL + aplicação + mock dos gateways
 docker-compose up -d
 
-# Aguarde o MySQL inicializar completamente (pode levar 1-2 minutos na primeira vez)
+# Aguarde todos os containers iniciarem (1-2 minutos na primeira vez)
+# Verifique os logs da aplicação:
+docker logs betalent_app
+
+# Roda as migrations e popula o banco
+docker exec betalent_app node ace migration:fresh --seed
+```
+
+O servidor estará disponível em `http://localhost:3333`.
+
+### Sem Docker (desenvolvimento local)
+```bash
+# Sobe apenas MySQL + mock dos gateways
+docker-compose up -d mysql gateway_mock
+
+# Aguarde o MySQL inicializar completamente (pode levar 1-2 minutos)
 # Verifique se está pronto com:
 docker logs betalent_mysql --tail 3
 # Quando aparecer "ready for connections" pode prosseguir
@@ -82,23 +99,23 @@ A collection do Postman está disponível em `docs/gateways-collection.json`.
 
 #### Usuários (só admin)
 
-| Método | Rota        | Descrição        |
-|--------|-------------|------------------|
-| GET    | /users      | Listar usuários  |
-| POST   | /users      | Criar usuário    |
-| GET    | /users/:id  | Detalhar usuário |
-| PUT    | /users/:id  | Atualizar usuário|
-| DELETE | /users/:id  | Deletar usuário  |
+| Método | Rota        | Descrição         |
+|--------|-------------|-------------------|
+| GET    | /users      | Listar usuários   |
+| POST   | /users      | Criar usuário     |
+| GET    | /users/:id  | Detalhar usuário  |
+| PUT    | /users/:id  | Atualizar usuário |
+| DELETE | /users/:id  | Deletar usuário   |
 
 #### Produtos (autenticado)
 
-| Método | Rota           | Descrição        |
-|--------|----------------|------------------|
-| GET    | /products      | Listar produtos  |
-| POST   | /products      | Criar produto    |
-| GET    | /products/:id  | Detalhar produto |
-| PUT    | /products/:id  | Atualizar produto|
-| DELETE | /products/:id  | Deletar produto  |
+| Método | Rota           | Descrição         |
+|--------|----------------|-------------------|
+| GET    | /products      | Listar produtos   |
+| POST   | /products      | Criar produto     |
+| GET    | /products/:id  | Detalhar produto  |
+| PUT    | /products/:id  | Atualizar produto |
+| DELETE | /products/:id  | Deletar produto   |
 
 #### Clientes (só admin)
 
@@ -117,10 +134,10 @@ A collection do Postman está disponível em `docs/gateways-collection.json`.
 
 #### Gateways (só admin)
 
-| Método | Rota                     | Descrição                |
-|--------|--------------------------|--------------------------|
-| PATCH  | /gateways/:id/toggle     | Ativar/desativar gateway |
-| PATCH  | /gateways/:id/priority   | Alterar prioridade       |
+| Método | Rota                   | Descrição                |
+|--------|------------------------|--------------------------|
+| PATCH  | /gateways/:id/toggle   | Ativar/desativar gateway |
+| PATCH  | /gateways/:id/priority | Alterar prioridade       |
 
 ## 📦 Exemplo de compra
 ```json
@@ -139,6 +156,21 @@ POST /transactions
 ## 🔄 Lógica de fallback
 
 Ao realizar uma compra, o sistema tenta processar pelo gateway de maior prioridade (menor número). Se falhar, tenta o próximo gateway ativo automaticamente. O cliente nunca recebe um erro se ao menos um gateway funcionar.
+
+Para adicionar um novo gateway basta:
+1. Criar `app/services/gateways/gateway_three.ts` implementando a `GatewayInterface`
+2. Adicionar o caso no `getGatewayInstance()` do `PaymentService`
+3. Inserir o novo gateway no banco de dados com a prioridade desejada
+
+## 🗄️ Estrutura do Banco de Dados
+```
+users                    → usuários do sistema
+gateways                 → gateways de pagamento
+clients                  → clientes que realizam compras
+products                 → produtos disponíveis
+transactions             → transações realizadas
+transaction_products     → produtos de cada transação
+```
 
 ## ⚠️ Pendências
 

@@ -18,6 +18,26 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build: .
+    container_name: betalent_app
+    restart: always
+    ports:
+      - "3333:3333"
+    environment:
+      PORT: 3333
+      HOST: 0.0.0.0
+      NODE_ENV: production
+      APP_KEY: ${APP_KEY}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_DATABASE: betalent
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   gateway_mock:
     image: matheusprotzen/gateways-mock
     container_name: betalent_gateways
