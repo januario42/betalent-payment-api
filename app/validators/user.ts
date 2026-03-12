@@ -1,26 +1,19 @@
 import vine from '@vinejs/vine'
 
-/**
- * Shared rules for email and password.
- */
-const email = () => vine.string().email().maxLength(254)
-const password = () => vine.string().minLength(8).maxLength(32)
+export const createUserValidator = vine.compile(
+  vine.object({
+    fullName: vine.string().trim().minLength(2),
+    email: vine.string().email(),
+    password: vine.string().minLength(6),
+    role: vine.enum(['admin', 'user']),
+  })
+)
 
-/**
- * Validator to use when performing self-signup
- */
-export const signupValidator = vine.create({
-  fullName: vine.string().nullable(),
-  email: email().unique({ table: 'users', column: 'email' }),
-  password: password(),
-  passwordConfirmation: password().sameAs('password'),
-})
-
-/**
- * Validator to use before validating user credentials
- * during login
- */
-export const loginValidator = vine.create({
-  email: email(),
-  password: vine.string(),
-})
+export const updateUserValidator = vine.compile(
+  vine.object({
+    fullName: vine.string().trim().minLength(2).optional(),
+    email: vine.string().email().optional(),
+    password: vine.string().minLength(6).optional(),
+    role: vine.enum(['admin', 'user']).optional(),
+  })
+)
