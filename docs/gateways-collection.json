@@ -1,0 +1,216 @@
+{
+    "info": {
+        "_postman_id": "unique-id-here",
+        "name": "Multi-Gateways Mock APIs",
+        "description": "Para iniciar os mocks:\n\n**Com autenticação:**\n```bash\ndocker run -p 3001:3001 -p 3002:3002 matheusprotzen/gateways-mock\n```\n\n**Sem autenticação:**\n```bash\ndocker run -p 3001:3001 -p 3002:3002 -e REMOVE_AUTH='true' matheusprotzen/gateways-mock\n```",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Gateway 1",
+            "item": [
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"dev@betalent.tech\",\n    \"token\": \"FEC9BB078BF338F464F96B48089EB498\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3001/login",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3001",
+                            "path": ["login"]
+                        }
+                    }
+                },
+                {
+                    "name": "List Transactions",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{gateway1_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3001/transactions",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3001",
+                            "path": ["transactions"]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Transaction",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{gateway1_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"amount\": 1000,\n    \"name\": \"tester\",\n    \"email\": \"tester@email.com\",\n    \"cardNumber\": \"5569000000006063\",\n    \"cvv\": \"010\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3001/transactions",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3001",
+                            "path": ["transactions"]
+                        }
+                    }
+                },
+                {
+                    "name": "Chargeback",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{gateway1_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3001/transactions/:id/charge_back",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3001",
+                            "path": ["transactions", ":id", "charge_back"],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "",
+                                    "description": "ID da transação"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Gateway 2",
+            "item": [
+                {
+                    "name": "Listar Transações",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Gateway-Auth-Token",
+                                "value": "tk_f2198cc671b5289fa856"
+                            },
+                            {
+                                "key": "Gateway-Auth-Secret",
+                                "value": "3d15e8ed6131446ea7e3456728b1211f"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:3002/transacoes",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3002",
+                            "path": ["transacoes"]
+                        }
+                    }
+                },
+                {
+                    "name": "Criar Transação",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Gateway-Auth-Token",
+                                "value": "tk_f2198cc671b5289fa856"
+                            },
+                            {
+                                "key": "Gateway-Auth-Secret",
+                                "value": "3d15e8ed6131446ea7e3456728b1211f"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"valor\": 1000,\n    \"nome\": \"tester\",\n    \"email\": \"tester@email.com\",\n    \"numeroCartao\": \"5569000000006063\",\n    \"cvv\": \"010\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3002/transacoes",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3002",
+                            "path": ["transacoes"]
+                        }
+                    }
+                },
+                {
+                    "name": "Reembolso",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Gateway-Auth-Token",
+                                "value": "tk_f2198cc671b5289fa856"
+                            },
+                            {
+                                "key": "Gateway-Auth-Secret",
+                                "value": "3d15e8ed6131446ea7e3456728b1211f"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"id\": \"3d15e8ed-6131-446e-a7e3-456728b1211f\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3002/transacoes/reembolso",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3002",
+                            "path": ["transacoes", "reembolso"]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
