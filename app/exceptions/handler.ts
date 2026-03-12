@@ -20,9 +20,14 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       return ctx.response.notFound({ message: 'Recurso não encontrado' })
     }
 
-    // Erro de validação — já tratado pelo VineJS
+    // Erro de validação
     if (error.code === 'E_VALIDATION_ERROR') {
       return ctx.response.unprocessableEntity({ errors: error.messages })
+    }
+
+    // Erros gerais de aplicação (ex: todos os gateways falharam)
+    if (error instanceof Error) {
+      return ctx.response.internalServerError({ message: error.message })
     }
 
     return super.handle(error, ctx)
