@@ -174,5 +174,5 @@ transaction_products     → produtos de cada transação
 
 ## ⚠️ Pendências
 
-- TDD não foi implementado devido ao prazo reduzido. Seria o próximo passo utilizando o Japa (test runner nativo do AdonisJS).
+- TDD não foi implementado . Seria o próximo passo utilizando o Japa (test runner nativo do AdonisJS).
 - Roles de produtos poderiam ser mais granulares (ex: separar quem pode criar vs apenas visualizar).
