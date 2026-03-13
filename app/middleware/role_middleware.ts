@@ -7,9 +7,9 @@ export default class RoleMiddleware {
     next: NextFn,
     options: { roles: string[] }
   ) {
-    const user = auth.user!
+    const user = auth.user
 
-    if (!options.roles.includes(user.role)) {
+    if (!user || !options.roles.includes(user.role)) {
       return response.forbidden({ message: 'Acesso negado' })
     }
 

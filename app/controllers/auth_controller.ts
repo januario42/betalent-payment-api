@@ -1,6 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import { loginValidator } from '#validators/user'
+import { AccessToken } from '@adonisjs/auth/access_tokens'
+
+type AuthenticatedUser = User & { currentAccessToken: AccessToken }
 
 export default class AuthController {
   async login({ request, response }: HttpContext) {
@@ -8,7 +11,7 @@ export default class AuthController {
     const user = await User.verifyCredentials(email, password)
     const token = await User.accessTokens.create(user)
     return response.ok({
-      token: token.value!.release(),
+      token: token.value?.release(),
       user: {
         id: user.id,
         fullName: user.fullName,
@@ -20,7 +23,7 @@ export default class AuthController {
 
   async logout({ auth, response }: HttpContext) {
     try {
-      const user = auth.user as any
+      const user = auth.user as AuthenticatedUser
       await User.accessTokens.delete(user, user.currentAccessToken.identifier)
       return response.ok({ message: 'Logout realizado com sucesso' })
     } catch {
