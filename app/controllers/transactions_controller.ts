@@ -7,7 +7,7 @@ import PaymentService from '#services/payment_service'
 import { createTransactionValidator } from '#validators/transaction'
 
 export default class TransactionsController {
- async index({ request, response }: HttpContext) {
+async index({ request, response }: HttpContext) {
   const page = request.input('page', 1)
   const limit = request.input('limit', 10)
 
@@ -17,6 +17,7 @@ export default class TransactionsController {
     .preload('transactionProducts', (query) => {
       query.preload('product')
     })
+    .orderBy('created_at', 'desc')
     .paginate(page, limit)
 
   return response.ok(transactions)

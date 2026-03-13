@@ -17,3 +17,10 @@ export const updateUserValidator = vine.compile(
     role: vine.enum(['admin', 'user']).optional(),
   })
 )
+
+export const loginValidator = vine.compile(
+  vine.object({
+    email: vine.string().email(),
+    password: vine.string().minLength(6),
+  })
+)
