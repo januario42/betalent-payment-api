@@ -341,4 +341,3 @@ Junior Backend Developer | Node.js • TypeScript • APIs
 
 **Construindo APIs que nunca falham. 🚀**
 
-Made with ❤️ in Rio de Janeiro
